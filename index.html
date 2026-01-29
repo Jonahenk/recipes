@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Recipes</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #222;
+        }
+        .search {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .recipe-count {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .recipe-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .recipe-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: box-shadow 0.2s;
+        }
+        .recipe-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .recipe-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #222;
+        }
+        .recipe-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.75rem;
+        }
+        .recipe-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .tag {
+            background: #e8e8e8;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .recipe-source {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .recipe-source a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .recipe-source a:hover {
+            text-decoration: underline;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+        .empty {
+            text-align: center;
+            color: #666;
+            padding: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍳 My Recipes</h1>
+        <input type="text" class="search" id="search" placeholder="Search recipes...">
+        <div class="recipe-count" id="count">Loading...</div>
+        <div class="recipe-list" id="recipes">
+            <div class="loading">Loading recipes...</div>
+        </div>
+    </div>
+
+    <script>
+        async function loadRecipes() {
+            try {
+                const response = await fetch('data/recipes.json');
+                const data = await response.json();
+                const recipes = data.recipes || [];
+                
+                displayRecipes(recipes);
+                setupSearch(recipes);
+            } catch (err) {
+                document.getElementById('recipes').innerHTML = 
+                    '<div class="empty">No recipes yet. Share one with /recipe!</div>';
+                document.getElementById('count').textContent = '0 recipes';
+            }
+        }
+
+        function displayRecipes(recipes) {
+            const container = document.getElementById('recipes');
+            const countEl = document.getElementById('count');
+            
+            countEl.textContent = `${recipes.length} recipe${recipes.length !== 1 ? 's' : ''}`;
+            
+            if (recipes.length === 0) {
+                container.innerHTML = '<div class="empty">No recipes yet. Share one with /recipe!</div>';
+                return;
+            }
+            
+            container.innerHTML = recipes.map(r => `
+                <div class="recipe-card" data-title="${r.title.toLowerCase()}">
+                    <div class="recipe-title">${escapeHtml(r.title)}</div>
+                    <div class="recipe-meta">
+                        ${r.metadata?.time ? `<span>⏱️ ${escapeHtml(r.metadata.time)}</span>` : ''}
+                        ${r.metadata?.difficulty ? `<span>📊 ${escapeHtml(r.metadata.difficulty)}</span>` : ''}
+                    </div>
+                    ${r.metadata?.tags?.length ? `
+                        <div class="tags">
+                            ${r.metadata.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="recipe-source">
+                        From: <a href="${escapeHtml(r.source?.url || '#')}" target="_blank">${escapeHtml(r.source?.platform || 'Unknown')}</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupSearch(recipes) {
+            const search = document.getElementById('search');
+            search.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                const cards = document.querySelectorAll('.recipe-card');
+                
+                cards.forEach(card => {
+                    const title = card.dataset.title;
+                    card.style.display = title.includes(term) ? 'block' : 'none';
+                });
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        loadRecipes();
+    </script>
+</body>
+</html>
