@@ -10,14 +10,13 @@
       "metadata": {
         "time": "10 minutes",
         "difficulty": "easy",
-        "tags": [
-          "pasta",
-          "seafood",
-          "quick",
-          "budget",
-          "sardines",
-          "italian"
-        ]
+        "tags": ["pasta", "seafood", "quick", "budget", "sardines", "italian"]
+      },
+      "colors": {
+        "primary": "hsl(25, 80%, 55%)",
+        "secondary": "hsl(55, 70%, 60%)",
+        "accent": "hsl(205, 75%, 50%)",
+        "gradient": "linear-gradient(135deg, hsl(25, 80%, 55%), hsl(65, 70%, 60%))"
       }
     },
     {
@@ -28,15 +27,15 @@
         "creator": "@unknown"
       },
       "metadata": {
-        "time": "45 minutes",
-        "difficulty": "easy",
-        "tags": [
-          "potato",
-          "salad",
-          "tahini",
-          "chili crisp",
-          "vegetarian"
-        ]
+        "time": "30 minutes",
+        "difficulty": "medium",
+        "tags": ["potatoes", "spicy", "side-dish"]
+      },
+      "colors": {
+        "primary": "hsl(280, 80%, 55%)",
+        "secondary": "hsl(310, 70%, 60%)",
+        "accent": "hsl(100, 75%, 50%)",
+        "gradient": "linear-gradient(135deg, hsl(280, 80%, 55%), hsl(320, 70%, 60%))"
       }
     }
   ]

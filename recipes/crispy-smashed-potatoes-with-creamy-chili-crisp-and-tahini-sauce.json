@@ -98,5 +98,11 @@
     "Mix mayonnaise, yogurt, tahini, chili crisp, lime juice, soy sauce, garlic, and ginger to make the sauce.",
     "Finish with spring onion, fresh coriander, and sesame seeds."
   ],
-  "notes": "Full recipe details can be found in the link provided."
+  "notes": "Full recipe details can be found in the link provided.",
+  "colors": {
+    "primary": "hsl(280, 80%, 55%)",
+    "secondary": "hsl(310, 70%, 60%)",
+    "accent": "hsl(100, 75%, 50%)",
+    "gradient": "linear-gradient(135deg, hsl(280, 80%, 55%), hsl(320, 70%, 60%))"
+  }
 }
