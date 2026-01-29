@@ -3,38 +3,76 @@
   "source": {
     "url": "https://vm.tiktok.com/ZGdmsDpFJ/",
     "platform": "tiktok",
-    "creator": "@runandeatwithjack"
+    "creator": "@unknown"
   },
   "metadata": {
     "time": "10 minutes",
     "difficulty": "easy",
-    "tags": ["pasta", "seafood", "quick", "budget", "sardines", "italian"]
+    "tags": [
+      "pasta",
+      "sardine",
+      "italian"
+    ]
   },
   "ingredients": [
-    {"item": "Pasta", "amount": null, "prep": null},
-    {"item": "Canned sardines", "amount": null, "prep": null, "note": "Cornish tinned sardines"},
-    {"item": "Tomatoes", "amount": null, "prep": "chopped"},
-    {"item": "Parsley", "amount": null, "prep": "chopped"},
-    {"item": "Garlic", "amount": null, "prep": "chopped"},
-    {"item": "Capers", "amount": null, "prep": "chopped"},
-    {"item": "Olive oil", "amount": "from sardines + extra", "prep": null},
-    {"item": "Salt", "amount": null, "prep": null},
-    {"item": "Lemon juice", "amount": "a bit", "prep": null},
-    {"item": "Pasta water", "amount": "as needed", "prep": null}
+    {
+      "item": "Pasta",
+      "amount": null,
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Tin Sardines",
+      "amount": "1 tin",
+      "prep": null,
+      "note": "Cornish tin"
+    },
+    {
+      "item": "Tomatoes",
+      "amount": null,
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Parsley",
+      "amount": null,
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Garlic",
+      "amount": null,
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Capers",
+      "amount": null,
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Olive Oil",
+      "amount": null,
+      "prep": null,
+      "note": "From the sardines and more"
+    },
+    {
+      "item": "Lemon",
+      "amount": "a bit",
+      "prep": null,
+      "note": null
+    }
   ],
   "instructions": [
-    "Bring salted water to a boil for pasta and cook for 8 minutes.",
-    "While pasta cooks, prepare ingredients: chop tomatoes, parsley, garlic, and capers.",
-    "Heat olive oil from the sardines in a pan.",
-    "Add salt, garlic, capers, and more olive oil.",
-    "Add a bit of pasta water to create a sauce.",
-    "Add most of the sardines, breaking them up but leaving some chunks. Reserve one fillet for topping.",
-    "Add a bit of lemon juice.",
-    "Cook the sauce for a few minutes until pasta is done.",
-    "Add drained pasta directly to the sauce, saving the pasta water.",
-    "Flip the pasta in the sauce a few times to coat.",
-    "Add some parsley and a touch more pasta water if needed.",
-    "Plate the pasta, garnish with additional parsley and the reserved sardine fillet."
+    "Cook pasta in salted water for 8 minutes.",
+    "Heat olive oil, garlic, and capers in a pan.",
+    "Add pasta water to the pan to create a sauce.",
+    "Add sardines (saving one fillet for garnish) and cook briefly.",
+    "Add lemon juice.",
+    "Combine cooked pasta with the sauce.",
+    "Add parsley and pasta water as needed.",
+    "Plate and garnish with parsley and the reserved sardine fillet."
   ],
-  "notes": "This is a quick 10-minute meal that's economical and a great way to use tinned sardines. The recipe uses Cornish tinned sardines."
+  "notes": null
 }

@@ -1,0 +1,265 @@
+#!/usr/bin/env python3
+"""
+Recipe Pipeline - Full automation from URL to GitHub
+Usage: python3 pipeline.py <video_url>
+"""
+
+import os
+import sys
+import json
+import subprocess
+import tempfile
+import shutil
+import urllib.request
+import time
+
+def run_command(cmd, cwd=None, timeout=300):
+    """Run a shell command and return output"""
+    result = subprocess.run(
+        cmd,
+        shell=True,
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+        timeout=timeout
+    )
+    if result.returncode != 0:
+        print(f"Command failed: {cmd}")
+        print(f"Error: {result.stderr}")
+        return None
+    return result.stdout.strip()
+
+def download_video(url, api_key, work_dir):
+    """Download video via Cobalt"""
+    print("[1/5] Downloading video via Cobalt...")
+    
+    cobalt_url = "https://cobalt.jsgroenendijk.nl"
+    
+    # Call Cobalt API
+    data = json.dumps({"url": url}).encode()
+    req = urllib.request.Request(
+        f"{cobalt_url}/",
+        data=data,
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": f"Api-Key {api_key}"
+        },
+        method="POST"
+    )
+    
+    response = urllib.request.urlopen(req)
+    result = json.loads(response.read().decode())
+    
+    if result.get("status") != "tunnel":
+        print(f"Cobalt error: {result}")
+        return None
+    
+    video_url = result["url"]
+    filename = result.get("filename", "video.mp4")
+    
+    # Download the video
+    video_path = os.path.join(work_dir, "video.mp4")
+    urllib.request.urlretrieve(video_url, video_path)
+    
+    size = os.path.getsize(video_path)
+    print(f"  ✓ Downloaded: {filename} ({size // 1024 // 1024}MB)")
+    return video_path
+
+def extract_audio(video_path, work_dir):
+    """Extract audio from video"""
+    print("[2/5] Extracting audio...")
+    
+    audio_path = os.path.join(work_dir, "audio.wav")
+    cmd = f'ffmpeg -i "{video_path}" -vn -acodec pcm_s16le -ar 16000 -ac 1 "{audio_path}" -y'
+    
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"FFmpeg error: {result.stderr}")
+        return None
+    
+    size = os.path.getsize(audio_path)
+    print(f"  ✓ Audio extracted: {size // 1024}KB")
+    return audio_path
+
+def transcribe(audio_path):
+    """Transcribe audio with Whisper"""
+    print("[3/5] Transcribing with Whisper...")
+    
+    whisper_dir = os.path.expanduser("~/whisper.cpp")
+    whisper_bin = os.path.join(whisper_dir, "build/bin/whisper-cli")
+    model_path = os.path.join(whisper_dir, "models/ggml-base.bin")
+    
+    cmd = f'"{whisper_bin}" -m "{model_path}" -f "{audio_path}" -l auto --no-timestamps -otxt'
+    
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Whisper error: {result.stderr}")
+        return None
+    
+    txt_path = audio_path + ".txt"
+    with open(txt_path, 'r') as f:
+        transcription = f.read().strip()
+    
+    print(f"  ✓ Transcribed: {len(transcription)} chars")
+    return transcription
+
+def extract_recipe(transcription, source_url, api_key):
+    """Extract recipe structure using Gemini"""
+    print("[4/5] Extracting recipe structure...")
+    
+    # Detect platform from URL
+    platform = "unknown"
+    creator = "unknown"
+    if "tiktok" in source_url:
+        platform = "tiktok"
+    elif "instagram" in source_url:
+        platform = "instagram"
+    elif "youtube" in source_url:
+        platform = "youtube"
+    
+    prompt = f"""Extract a recipe from this cooking video transcription and output as JSON.
+
+Transcription:
+{transcription}
+
+Source: {source_url}
+Platform: {platform}
+
+Output ONLY this JSON structure:
+{{"title": "Recipe Title", "source": {{"url": "{source_url}", "platform": "{platform}", "creator": "@{creator}"}}, "metadata": {{"time": "X minutes", "difficulty": "easy/medium/hard", "tags": ["tag1", "tag2"]}}, "ingredients": [{{"item": "name", "amount": "quantity or null", "prep": "chopped/etc or null", "note": "optional note"}}], "instructions": ["step 1", "step 2"], "notes": "any extra notes"}}
+
+Rules:
+- Use null for unknown amounts
+- Include prep notes in "prep" field (chopped, minced, etc.)
+- Estimate time from video description
+- Tags should include cuisine type and key ingredients
+- Keep instructions clear and actionable
+- Be concise"""
+
+    data = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "temperature": 0.1
+        }
+    }
+    
+    req = urllib.request.Request(
+        f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}",
+        data=json.dumps(data).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+    
+    response = urllib.request.urlopen(req)
+    result = json.loads(response.read().decode())
+    
+    text = result['candidates'][0]['content']['parts'][0]['text']
+    recipe = json.loads(text)
+    
+    print(f"  ✓ Extracted: {recipe.get('title', 'Unknown')}")
+    return recipe
+
+def save_to_github(recipe, transcription):
+    """Save recipe to GitHub repo"""
+    print("[5/5] Saving to GitHub...")
+    
+    repo_dir = "/home/jonathan/clawd/recipes"
+    
+    # Create slug from title
+    slug = recipe['title'].lower().replace(' ', '-').replace('/', '-')
+    slug = ''.join(c for c in slug if c.isalnum() or c == '-')
+    
+    # Save full recipe
+    recipe_path = os.path.join(repo_dir, "recipes", f"{slug}.json")
+    with open(recipe_path, 'w') as f:
+        json.dump(recipe, f, indent=2)
+    
+    # Update index
+    index_path = os.path.join(repo_dir, "data", "recipes.json")
+    with open(index_path, 'r') as f:
+        index = json.load(f)
+    
+    # Add to index (avoid duplicates)
+    existing = [r for r in index['recipes'] if r['source']['url'] == recipe['source']['url']]
+    if not existing:
+        index['recipes'].append({
+            "title": recipe['title'],
+            "source": recipe['source'],
+            "metadata": recipe['metadata']
+        })
+        
+        with open(index_path, 'w') as f:
+            json.dump(index, f, indent=2)
+    
+    # Commit and push
+    os.chdir(repo_dir)
+    run_command('git add -A')
+    run_command(f'git commit -m "Add recipe: {recipe["title"]}"')
+    run_command('git push origin main')
+    
+    print(f"  ✓ Committed: {slug}.json")
+    return f"https://jonahenk.github.io/recipes/"
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python3 pipeline.py <video_url>")
+        sys.exit(1)
+    
+    video_url = sys.argv[1]
+    cobalt_key = "DVmbGlgwzCGBbYtnBQnoRiRDXFGChVlc"
+    gemini_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
+    
+    if not gemini_key:
+        print("Error: GEMINI_API_KEY or GOOGLE_API_KEY not set")
+        sys.exit(1)
+    
+    # Create temp directory
+    work_dir = tempfile.mkdtemp(prefix='recipe-')
+    
+    try:
+        print(f"=== Recipe Pipeline ===")
+        print(f"URL: {video_url}")
+        print()
+        
+        # Step 1: Download
+        video_path = download_video(video_url, cobalt_key, work_dir)
+        if not video_path:
+            print("Failed to download video")
+            return None
+        
+        # Step 2: Extract audio
+        audio_path = extract_audio(video_path, work_dir)
+        if not audio_path:
+            print("Failed to extract audio")
+            return None
+        
+        # Step 3: Transcribe
+        transcription = transcribe(audio_path)
+        if not transcription:
+            print("Failed to transcribe")
+            return None
+        
+        # Step 4: Extract recipe
+        recipe = extract_recipe(transcription, video_url, gemini_key)
+        if not recipe:
+            print("Failed to extract recipe")
+            return None
+        
+        # Step 5: Save to GitHub
+        site_url = save_to_github(recipe, transcription)
+        
+        print()
+        print(f"=== Done! ===")
+        print(f"Recipe: {recipe['title']}")
+        print(f"Site: {site_url}")
+        
+        return recipe
+        
+    finally:
+        # Cleanup
+        shutil.rmtree(work_dir, ignore_errors=True)
+
+if __name__ == "__main__":
+    main()
