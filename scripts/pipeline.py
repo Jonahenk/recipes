@@ -207,7 +207,22 @@ def main():
         print("Usage: python3 pipeline.py <video_url>")
         sys.exit(1)
     
-    video_url = sys.argv[1]
+    video_url = sys.argv[1].strip()
+    
+    # Check if already exists
+    repo_dir = "/home/jonathan/clawd/recipes"
+    index_path = os.path.join(repo_dir, "data", "recipes.json")
+    with open(index_path, 'r') as f:
+        index = json.load(f)
+    
+    # Normalize URL for comparison (remove trailing slashes)
+    normalized_url = video_url.rstrip('/')
+    for existing in index['recipes']:
+        if existing['source']['url'].rstrip('/') == normalized_url:
+            print(f"⚠️ Recipe already exists: {existing['title']}")
+            print(f"🔗 https://jonahenk.github.io/recipes/")
+            return None
+    
     cobalt_key = "DVmbGlgwzCGBbYtnBQnoRiRDXFGChVlc"
     gemini_key = os.environ.get('GEMINI_API_KEY') or os.environ.get('GOOGLE_API_KEY')
     

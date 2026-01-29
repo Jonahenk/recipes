@@ -46,6 +46,7 @@
             padding: 1.25rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: box-shadow 0.2s;
+            cursor: pointer;
         }
         .recipe-card:hover {
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -92,15 +93,117 @@
         .recipe-source a:hover {
             text-decoration: underline;
         }
-        .loading {
-            text-align: center;
-            color: #666;
-            padding: 2rem;
-        }
-        .empty {
+        .loading, .empty {
             text-align: center;
             color: #666;
             padding: 3rem;
+        }
+        
+        /* Modal/Detail view */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            overflow-y: auto;
+        }
+        .modal.active {
+            display: block;
+        }
+        .modal-content {
+            background: white;
+            max-width: 700px;
+            margin: 2rem auto;
+            border-radius: 16px;
+            padding: 2rem;
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .modal-close:hover {
+            color: #000;
+        }
+        .detail-title {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        .detail-section {
+            margin: 1.5rem 0;
+        }
+        .detail-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: #444;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        .ingredients-list {
+            list-style: none;
+        }
+        .ingredients-list li {
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .ingredients-list li:last-child {
+            border-bottom: none;
+        }
+        .ingredient-amount {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .ingredient-prep {
+            color: #888;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+        .instructions-list {
+            counter-reset: step;
+            list-style: none;
+        }
+        .instructions-list li {
+            padding: 0.75rem 0;
+            padding-left: 2.5rem;
+            position: relative;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .instructions-list li:last-child {
+            border-bottom: none;
+        }
+        .instructions-list li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0.75rem;
+            width: 1.75rem;
+            height: 1.75rem;
+            background: #0066cc;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .notes {
+            background: #f8f8f8;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #555;
         }
     </style>
 </head>
@@ -114,19 +217,43 @@
         </div>
     </div>
 
+    <!-- Modal for recipe details -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
     <script>
+        let allRecipes = [];
+        let recipeDetails = {};
+
         async function loadRecipes() {
             try {
                 const response = await fetch('data/recipes.json');
                 const data = await response.json();
-                const recipes = data.recipes || [];
+                allRecipes = data.recipes || [];
                 
-                displayRecipes(recipes);
-                setupSearch(recipes);
+                displayRecipes(allRecipes);
+                setupSearch(allRecipes);
             } catch (err) {
                 document.getElementById('recipes').innerHTML = 
                     '<div class="empty">No recipes yet. Share one with /recipe!</div>';
                 document.getElementById('count').textContent = '0 recipes';
+            }
+        }
+
+        async function loadRecipeDetail(slug) {
+            if (recipeDetails[slug]) return recipeDetails[slug];
+            
+            try {
+                const response = await fetch(`recipes/${slug}.json`);
+                const recipe = await response.json();
+                recipeDetails[slug] = recipe;
+                return recipe;
+            } catch (err) {
+                return null;
             }
         }
 
@@ -141,8 +268,10 @@
                 return;
             }
             
-            container.innerHTML = recipes.map(r => `
-                <div class="recipe-card" data-title="${r.title.toLowerCase()}">
+            container.innerHTML = recipes.map((r, i) => {
+                const slug = r.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                return `
+                <div class="recipe-card" data-title="${r.title.toLowerCase()}" data-slug="${slug}" onclick="openRecipe('${slug}')">
                     <div class="recipe-title">${escapeHtml(r.title)}</div>
                     <div class="recipe-meta">
                         ${r.metadata?.time ? `<span>⏱️ ${escapeHtml(r.metadata.time)}</span>` : ''}
@@ -154,10 +283,77 @@
                         </div>
                     ` : ''}
                     <div class="recipe-source">
-                        From: <a href="${escapeHtml(r.source?.url || '#')}" target="_blank">${escapeHtml(r.source?.platform || 'Unknown')}</a>
+                        From: <a href="${escapeHtml(r.source?.url || '#')}" target="_blank" onclick="event.stopPropagation()">${escapeHtml(r.source?.platform || 'Unknown')}</a>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
+        }
+
+        async function openRecipe(slug) {
+            const recipe = await loadRecipeDetail(slug);
+            if (!recipe) return;
+            
+            const modal = document.getElementById('modal');
+            const body = document.getElementById('modal-body');
+            
+            body.innerHTML = `
+                <h2 class="detail-title">${escapeHtml(recipe.title)}</h2>
+                
+                <div class="recipe-meta" style="margin-bottom: 1.5rem;">
+                    ${recipe.metadata?.time ? `<span>⏱️ ${escapeHtml(recipe.metadata.time)}</span>` : ''}
+                    ${recipe.metadata?.difficulty ? `<span>📊 ${escapeHtml(recipe.metadata.difficulty)}</span>` : ''}
+                </div>
+                
+                ${recipe.metadata?.tags?.length ? `
+                    <div class="tags" style="margin-bottom: 1.5rem;">
+                        ${recipe.metadata.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h3>📝 Ingredients</h3>
+                    <ul class="ingredients-list">
+                        ${recipe.ingredients?.map(ing => `
+                            <li>
+                                ${escapeHtml(ing.item)}
+                                ${ing.amount ? `<span class="ingredient-amount"> — ${escapeHtml(ing.amount)}</span>` : ''}
+                                ${ing.prep ? `<span class="ingredient-prep"> (${escapeHtml(ing.prep)})</span>` : ''}
+                                ${ing.note ? `<span class="ingredient-prep"> — ${escapeHtml(ing.note)}</span>` : ''}
+                            </li>
+                        `).join('') || '<li>No ingredients listed</li>'}
+                    </ul>
+                </div>
+                
+                <div class="detail-section">
+                    <h3>👨‍🍳 Instructions</h3>
+                    <ol class="instructions-list">
+                        ${recipe.instructions?.map(step => `
+                            <li>${escapeHtml(step)}</li>
+                        `).join('') || '<li>No instructions listed</li>'}
+                    </ol>
+                </div>
+                
+                ${recipe.notes ? `
+                    <div class="detail-section">
+                        <h3>💡 Notes</h3>
+                        <div class="notes">${escapeHtml(recipe.notes)}</div>
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h3>🔗 Source</h3>
+                    <a href="${escapeHtml(recipe.source?.url || '#')}" target="_blank">${escapeHtml(recipe.source?.platform || 'Link')}</a>
+                    ${recipe.source?.creator ? ` by ${escapeHtml(recipe.source.creator)}` : ''}
+                </div>
+            `;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         function setupSearch(recipes) {
@@ -179,6 +375,16 @@
             div.textContent = text;
             return div.innerHTML;
         }
+
+        // Close modal on backdrop click
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
 
         loadRecipes();
     </script>
