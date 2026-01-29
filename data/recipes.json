@@ -2,6 +2,7 @@
   "recipes": [
     {
       "title": "Sardine Pasta",
+      "slug": "sardine-pasta",
       "source": {
         "url": "https://vm.tiktok.com/ZGdmsDpFJ/",
         "platform": "tiktok",
@@ -21,6 +22,7 @@
     },
     {
       "title": "Crispy Smashed Potatoes with Creamy Chili Crisp and Tahini Sauce",
+      "slug": "crispy-smashed-potatoes-with-creamy-chili-crisp-and-tahini-sauce",
       "source": {
         "url": "https://vm.tiktok.com/ZGdmsyoRD/",
         "platform": "tiktok",

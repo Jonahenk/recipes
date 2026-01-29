@@ -724,9 +724,10 @@
             grid.innerHTML = filtered.map(recipe => {
                 const isFav = favorites.includes(recipe.source.url);
                 const colors = recipe.colors || generateColors(recipe.title);
+                const slug = recipe.slug || recipe.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
                 
                 return `
-                    <article class="recipe-card" onclick="openRecipe('${recipe.source.url}')">
+                    <article class="recipe-card" onclick="openRecipe('${slug}')">
                         ${recipe.thumbnail ? 
                             `<img src="${recipe.thumbnail}" class="recipe-image" alt="">` :
                             `<div class="recipe-image-placeholder" style="background: ${colors.gradient}; color: white;">🍽️</div>`
@@ -791,15 +792,15 @@
         }
 
         // Open recipe
-        async function openRecipe(url) {
-            let recipe = recipeDetails[url];
+        async function openRecipe(slug) {
+            let recipe = recipeDetails[slug];
             if (!recipe) {
                 try {
-                    const slug = url.split('/').pop();
                     const response = await fetch(`recipes/${slug}.json`);
                     recipe = await response.json();
-                    recipeDetails[url] = recipe;
+                    recipeDetails[slug] = recipe;
                 } catch (err) {
+                    console.error('Failed to load recipe:', err);
                     return;
                 }
             }
@@ -819,7 +820,7 @@
                 <h2 class="modal-title">${escapeHtml(recipe.title)}</h2>
                 
                 <div class="modal-actions">
-                    <button class="btn btn-primary" onclick="startCookingMode('${url}')">👨‍🍳 Start Cooking</button>
+                    <button class="btn btn-primary" onclick="startCookingMode('${slug}')">👨‍🍳 Start Cooking</button>
                     <button class="btn btn-ghost" onclick="window.open('${recipe.source.url}', '_blank')">🔗 View Source</button>
                 </div>
                 
@@ -865,8 +866,8 @@
         }
 
         // Cooking Mode
-        function startCookingMode(url) {
-            const recipe = recipeDetails[url];
+        function startCookingMode(slug) {
+            const recipe = recipeDetails[slug];
             if (!recipe) return;
             
             currentCookingRecipe = recipe;
