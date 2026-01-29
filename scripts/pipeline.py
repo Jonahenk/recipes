@@ -86,7 +86,7 @@ def download_video(url, api_key, work_dir, max_retries=3):
 
 def extract_audio(video_path, work_dir):
     """Extract audio from video"""
-    print("[2/5] Extracting audio...")
+    print("[2/6] Extracting audio...")
     
     audio_path = os.path.join(work_dir, "audio.wav")
     cmd = f'ffmpeg -i "{video_path}" -vn -acodec pcm_s16le -ar 16000 -ac 1 "{audio_path}" -y'
@@ -100,9 +100,26 @@ def extract_audio(video_path, work_dir):
     print(f"  ✓ Audio extracted: {size // 1024}KB")
     return audio_path
 
+def extract_thumbnail(video_path, work_dir):
+    """Extract thumbnail from video (at 3 second mark)"""
+    print("[3/6] Extracting thumbnail...")
+    
+    thumb_path = os.path.join(work_dir, "thumbnail.jpg")
+    # Extract frame at 3 seconds, scale to 800px width
+    cmd = f'ffmpeg -i "{video_path}" -ss 00:00:03 -vframes 1 -q:v 2 -vf "scale=800:-1" "{thumb_path}" -y'
+    
+    result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"  ⚠️ Thumbnail extraction failed: {result.stderr[:100]}")
+        return None
+    
+    size = os.path.getsize(thumb_path)
+    print(f"  ✓ Thumbnail: {size // 1024}KB")
+    return thumb_path
+
 def transcribe(audio_path):
     """Transcribe audio with Whisper"""
-    print("[3/5] Transcribing with Whisper...")
+    print("[4/6] Transcribing with Whisper...")
     
     whisper_dir = os.path.expanduser("~/whisper.cpp")
     whisper_bin = os.path.join(whisper_dir, "build/bin/whisper-cli")
@@ -124,7 +141,7 @@ def transcribe(audio_path):
 
 def extract_recipe(transcription, source_url, api_key):
     """Extract recipe structure using Gemini"""
-    print("[4/5] Extracting recipe structure...")
+    print("[5/6] Extracting recipe structure...")
     
     # Detect platform from URL
     platform = "unknown"
@@ -179,15 +196,42 @@ Rules:
     print(f"  ✓ Extracted: {recipe.get('title', 'Unknown')}")
     return recipe
 
-def save_to_github(recipe, transcription):
+def generate_color_scheme(title):
+    """Generate a color scheme based on recipe title"""
+    import hashlib
+    
+    # Create hash from title
+    hash_val = int(hashlib.md5(title.encode()).hexdigest(), 16)
+    
+    # Generate hue from hash (0-360)
+    hue = hash_val % 360
+    
+    # Create complementary color scheme
+    return {
+        "primary": f"hsl({hue}, 80%, 55%)",
+        "secondary": f"hsl({(hue + 30) % 360}, 70%, 60%)",
+        "accent": f"hsl({(hue + 180) % 360}, 75%, 50%)",
+        "gradient": f"linear-gradient(135deg, hsl({hue}, 80%, 55%), hsl({(hue + 40) % 360}, 70%, 60%))"
+    }
+
+def save_to_github(recipe, transcription, thumbnail_path=None):
     """Save recipe to GitHub repo"""
-    print("[5/5] Saving to GitHub...")
+    print("[6/6] Saving to GitHub...")
     
     repo_dir = "/home/jonathan/clawd/recipes"
     
     # Create slug from title
     slug = recipe['title'].lower().replace(' ', '-').replace('/', '-')
     slug = ''.join(c for c in slug if c.isalnum() or c == '-')
+    
+    # Generate and add color scheme
+    recipe['colors'] = generate_color_scheme(recipe['title'])
+    
+    # Copy thumbnail to repo if exists
+    if thumbnail_path and os.path.exists(thumbnail_path):
+        thumb_dest = os.path.join(repo_dir, "recipes", f"{slug}.jpg")
+        shutil.copy(thumbnail_path, thumb_dest)
+        recipe['thumbnail'] = f"recipes/{slug}.jpg"
     
     # Save full recipe
     recipe_path = os.path.join(repo_dir, "recipes", f"{slug}.json")
@@ -202,11 +246,15 @@ def save_to_github(recipe, transcription):
     # Add to index (avoid duplicates)
     existing = [r for r in index['recipes'] if r['source']['url'] == recipe['source']['url']]
     if not existing:
-        index['recipes'].append({
+        index_entry = {
             "title": recipe['title'],
             "source": recipe['source'],
-            "metadata": recipe['metadata']
-        })
+            "metadata": recipe['metadata'],
+            "colors": recipe['colors']
+        }
+        if recipe.get('thumbnail'):
+            index_entry['thumbnail'] = recipe['thumbnail']
+        index['recipes'].append(index_entry)
         
         with open(index_path, 'w') as f:
             json.dump(index, f, indent=2)
@@ -268,20 +316,23 @@ def main():
             print("Failed to extract audio")
             return None
         
-        # Step 3: Transcribe
+        # Step 3: Extract thumbnail
+        thumbnail_path = extract_thumbnail(video_path, work_dir)
+        
+        # Step 4: Transcribe
         transcription = transcribe(audio_path)
         if not transcription:
             print("Failed to transcribe")
             return None
         
-        # Step 4: Extract recipe
+        # Step 5: Extract recipe
         recipe = extract_recipe(transcription, video_url, gemini_key)
         if not recipe:
             print("Failed to extract recipe")
             return None
         
-        # Step 5: Save to GitHub
-        site_url = save_to_github(recipe, transcription)
+        # Step 6: Save to GitHub
+        site_url = save_to_github(recipe, transcription, thumbnail_path)
         
         print()
         print(f"=== Done! ===")
