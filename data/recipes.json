@@ -10,7 +10,33 @@
       "metadata": {
         "time": "10 minutes",
         "difficulty": "easy",
-        "tags": ["pasta", "seafood", "quick", "budget", "sardines", "italian"]
+        "tags": [
+          "pasta",
+          "seafood",
+          "quick",
+          "budget",
+          "sardines",
+          "italian"
+        ]
+      }
+    },
+    {
+      "title": "Crispy Smashed Potatoes with Creamy Chili Crisp and Tahini Sauce",
+      "source": {
+        "url": "https://vm.tiktok.com/ZGdmsyoRD/",
+        "platform": "tiktok",
+        "creator": "@unknown"
+      },
+      "metadata": {
+        "time": "45 minutes",
+        "difficulty": "easy",
+        "tags": [
+          "potato",
+          "salad",
+          "tahini",
+          "chili crisp",
+          "vegetarian"
+        ]
       }
     }
   ]
