@@ -248,6 +248,7 @@ def save_to_github(recipe, transcription, thumbnail_path=None):
     if not existing:
         index_entry = {
             "title": recipe['title'],
+            "slug": slug,
             "source": recipe['source'],
             "metadata": recipe['metadata'],
             "colors": recipe['colors']
