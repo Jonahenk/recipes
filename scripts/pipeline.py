@@ -29,42 +29,60 @@ def run_command(cmd, cwd=None, timeout=300):
         return None
     return result.stdout.strip()
 
-def download_video(url, api_key, work_dir):
-    """Download video via Cobalt"""
+def download_video(url, api_key, work_dir, max_retries=3):
+    """Download video via Cobalt with retry logic for Railway sleep"""
     print("[1/5] Downloading video via Cobalt...")
     
     cobalt_url = "https://cobalt.jsgroenendijk.nl"
     
-    # Call Cobalt API
-    data = json.dumps({"url": url}).encode()
-    req = urllib.request.Request(
-        f"{cobalt_url}/",
-        data=data,
-        headers={
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": f"Api-Key {api_key}"
-        },
-        method="POST"
-    )
+    for attempt in range(max_retries):
+        try:
+            # Call Cobalt API
+            data = json.dumps({"url": url}).encode()
+            req = urllib.request.Request(
+                f"{cobalt_url}/",
+                data=data,
+                headers={
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "Authorization": f"Api-Key {api_key}"
+                },
+                method="POST"
+            )
+            
+            response = urllib.request.urlopen(req, timeout=30)
+            result = json.loads(response.read().decode())
+            
+            if result.get("status") != "tunnel":
+                print(f"  ⚠️ Cobalt error: {result}")
+                if attempt < max_retries - 1:
+                    print(f"  Retrying in 5 seconds... ({attempt + 1}/{max_retries})")
+                    time.sleep(5)
+                    continue
+                return None
+            
+            video_url = result["url"]
+            filename = result.get("filename", "video.mp4")
+            
+            # Download the video
+            video_path = os.path.join(work_dir, "video.mp4")
+            urllib.request.urlretrieve(video_url, video_path)
+            
+            size = os.path.getsize(video_path)
+            print(f"  ✓ Downloaded: {filename} ({size // 1024 // 1024}MB)")
+            return video_path
+            
+        except Exception as e:
+            print(f"  ⚠️ Attempt {attempt + 1} failed: {str(e)[:100]}")
+            if attempt < max_retries - 1:
+                # Railway free tier sleeps after inactivity - wait for wake
+                print(f"  Waiting for Railway instance to wake up... (5s)")
+                time.sleep(5)
+            else:
+                print(f"  ✗ Failed after {max_retries} attempts")
+                return None
     
-    response = urllib.request.urlopen(req)
-    result = json.loads(response.read().decode())
-    
-    if result.get("status") != "tunnel":
-        print(f"Cobalt error: {result}")
-        return None
-    
-    video_url = result["url"]
-    filename = result.get("filename", "video.mp4")
-    
-    # Download the video
-    video_path = os.path.join(work_dir, "video.mp4")
-    urllib.request.urlretrieve(video_url, video_path)
-    
-    size = os.path.getsize(video_path)
-    print(f"  ✓ Downloaded: {filename} ({size // 1024 // 1024}MB)")
-    return video_path
+    return None
 
 def extract_audio(video_path, work_dir):
     """Extract audio from video"""
