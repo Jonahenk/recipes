@@ -1,3 +1,17 @@
 {
-  "recipes": []
+  "recipes": [
+    {
+      "title": "Sardine Pasta",
+      "source": {
+        "url": "https://vm.tiktok.com/ZGdmsDpFJ/",
+        "platform": "tiktok",
+        "creator": "@runandeatwithjack"
+      },
+      "metadata": {
+        "time": "10 minutes",
+        "difficulty": "easy",
+        "tags": ["pasta", "seafood", "quick", "budget", "sardines", "italian"]
+      }
+    }
+  ]
 }
