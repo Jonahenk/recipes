@@ -3,78 +3,88 @@
   "source": {
     "url": "https://vm.tiktok.com/ZGdmsDpFJ/",
     "platform": "tiktok",
-    "creator": "@unknown"
+    "creator": "@runandeatwithjack"
   },
   "metadata": {
-    "time": "10 minutes",
+    "time": "15 minutes",
     "difficulty": "easy",
+    "servings": 1,
     "tags": [
       "pasta",
       "sardine",
-      "italian"
+      "italian",
+      "quick",
+      "seafood"
     ]
   },
   "ingredients": [
     {
       "item": "Pasta",
-      "amount": null,
+      "amount": "100g",
       "prep": null,
-      "note": null
+      "note": "spaghetti or bucatini"
     },
     {
-      "item": "Tin Sardines",
+      "item": "Tinned sardines in olive oil",
       "amount": "1 tin",
       "prep": null,
-      "note": "Cornish tin"
+      "note": "save the oil for cooking"
     },
     {
-      "item": "Tomatoes",
-      "amount": null,
-      "prep": null,
-      "note": null
-    },
-    {
-      "item": "Parsley",
-      "amount": null,
-      "prep": null,
+      "item": "Cherry tomatoes",
+      "amount": "15",
+      "prep": "halved",
       "note": null
     },
     {
       "item": "Garlic",
-      "amount": null,
-      "prep": null,
+      "amount": "3 cloves",
+      "prep": "sliced",
       "note": null
     },
     {
       "item": "Capers",
-      "amount": null,
+      "amount": "10g",
       "prep": null,
       "note": null
     },
     {
-      "item": "Olive Oil",
-      "amount": null,
+      "item": "Fresh parsley",
+      "amount": "1 handful",
+      "prep": "chopped",
+      "note": null
+    },
+    {
+      "item": "Olive oil",
+      "amount": "2 tbsp",
       "prep": null,
-      "note": "From the sardines and more"
+      "note": "plus oil from the sardine tin"
     },
     {
       "item": "Lemon",
-      "amount": "a bit",
+      "amount": "1/2",
+      "prep": "juiced",
+      "note": null
+    },
+    {
+      "item": "Salt",
+      "amount": "to taste",
       "prep": null,
       "note": null
     }
   ],
   "instructions": [
-    "Cook pasta in salted water for 8 minutes.",
-    "Heat olive oil, garlic, and capers in a pan.",
-    "Add pasta water to the pan to create a sauce.",
-    "Add sardines (saving one fillet for garnish) and cook briefly.",
-    "Add lemon juice.",
-    "Combine cooked pasta with the sauce.",
-    "Add parsley and pasta water as needed.",
-    "Plate and garnish with parsley and the reserved sardine fillet."
+    "Cook pasta in generously salted boiling water until just shy of al dente. Reserve a cup of pasta water before draining.",
+    "Heat olive oil (including oil from the sardine tin) in a large pan over medium heat.",
+    "Add sliced garlic and capers, cook for 1-2 minutes until fragrant.",
+    "Add halved cherry tomatoes and cook for 2-3 minutes until they start to soften.",
+    "Add a ladle of pasta water to create a sauce.",
+    "Add sardines (saving one fillet for garnish), gently breaking them up. Cook briefly.",
+    "Add the drained pasta to the pan and toss to coat, adding more pasta water if needed.",
+    "Squeeze in lemon juice and add most of the parsley. Toss well.",
+    "Plate and garnish with the reserved sardine fillet and remaining parsley."
   ],
-  "notes": null,
+  "notes": "Use good quality tinned sardines in olive oil. The oil from the tin adds great flavor to the sauce.",
   "colors": {
     "primary": "hsl(25, 80%, 55%)",
     "secondary": "hsl(55, 70%, 60%)",

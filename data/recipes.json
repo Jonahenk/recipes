@@ -9,9 +9,10 @@
         "creator": "@runandeatwithjack"
       },
       "metadata": {
-        "time": "10 minutes",
+        "time": "15 minutes",
         "difficulty": "easy",
-        "tags": ["pasta", "seafood", "quick", "budget", "sardines", "italian"]
+        "servings": 1,
+        "tags": ["pasta", "sardine", "italian", "quick", "seafood"]
       },
       "colors": {
         "primary": "hsl(25, 80%, 55%)",
@@ -21,23 +22,24 @@
       }
     },
     {
-      "title": "Crispy Smashed Potatoes with Creamy Chili Crisp and Tahini Sauce",
+      "title": "Crispy Smashed Potatoes with Chili Crisp Tahini",
       "slug": "crispy-smashed-potatoes-with-creamy-chili-crisp-and-tahini-sauce",
       "source": {
         "url": "https://vm.tiktok.com/ZGdmsyoRD/",
         "platform": "tiktok",
-        "creator": "@unknown"
+        "creator": "@alfiecooks_"
       },
       "metadata": {
-        "time": "30 minutes",
-        "difficulty": "medium",
-        "tags": ["potatoes", "spicy", "side-dish"]
+        "time": "60 minutes",
+        "difficulty": "easy",
+        "servings": 4,
+        "tags": ["potatoes", "salad", "tahini", "chili crisp", "vegetarian", "side dish"]
       },
       "colors": {
-        "primary": "hsl(280, 80%, 55%)",
-        "secondary": "hsl(310, 70%, 60%)",
-        "accent": "hsl(100, 75%, 50%)",
-        "gradient": "linear-gradient(135deg, hsl(280, 80%, 55%), hsl(320, 70%, 60%))"
+        "primary": "hsl(35, 80%, 50%)",
+        "secondary": "hsl(25, 70%, 55%)",
+        "accent": "hsl(120, 60%, 40%)",
+        "gradient": "linear-gradient(135deg, hsl(35, 80%, 50%), hsl(25, 70%, 55%))"
       }
     }
   ]

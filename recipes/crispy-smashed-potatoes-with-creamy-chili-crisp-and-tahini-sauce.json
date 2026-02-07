@@ -1,108 +1,132 @@
 {
-  "title": "Crispy Smashed Potatoes with Creamy Chili Crisp and Tahini Sauce",
+  "title": "Crispy Smashed Potatoes with Chili Crisp Tahini",
   "source": {
     "url": "https://vm.tiktok.com/ZGdmsyoRD/",
     "platform": "tiktok",
-    "creator": "@unknown"
+    "creator": "@alfiecooks_"
   },
   "metadata": {
-    "time": "45 minutes",
+    "time": "60 minutes",
     "difficulty": "easy",
+    "servings": 4,
     "tags": [
-      "potato",
+      "potatoes",
       "salad",
       "tahini",
       "chili crisp",
-      "vegetarian"
+      "vegetarian",
+      "side dish"
     ]
   },
   "ingredients": [
     {
       "item": "Jersey Royal potatoes",
-      "amount": null,
+      "amount": "750g",
       "prep": null,
-      "note": "or other good quality potatoes"
+      "note": "or other baby new potatoes"
     },
     {
-      "item": "Mayonnaise",
-      "amount": null,
+      "item": "Olive oil",
+      "amount": "generous drizzle",
+      "prep": null,
+      "note": "for roasting"
+    },
+    {
+      "item": "Salt and pepper",
+      "amount": "to taste",
       "prep": null,
       "note": null
     },
     {
-      "item": "Yogurt",
-      "amount": null,
+      "item": "Mayonnaise",
+      "amount": "4 tbsp",
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Greek yogurt",
+      "amount": "4 tbsp",
       "prep": null,
       "note": null
     },
     {
       "item": "Tahini",
-      "amount": null,
+      "amount": "2 tbsp",
       "prep": null,
       "note": null
     },
     {
       "item": "Chili crisp",
-      "amount": null,
+      "amount": "2 tsp",
       "prep": null,
-      "note": null
+      "note": "plus extra for finishing"
     },
     {
-      "item": "Lime juice",
-      "amount": null,
-      "prep": null,
+      "item": "Lime",
+      "amount": "1",
+      "prep": "zested and juiced",
       "note": null
     },
     {
       "item": "Soy sauce",
-      "amount": null,
+      "amount": "1 tbsp",
+      "prep": null,
+      "note": null
+    },
+    {
+      "item": "Rice wine vinegar",
+      "amount": "1 tbsp",
       "prep": null,
       "note": null
     },
     {
       "item": "Garlic",
-      "amount": null,
+      "amount": "1 clove",
       "prep": "minced",
       "note": null
     },
     {
-      "item": "Ginger",
-      "amount": null,
+      "item": "Fresh ginger",
+      "amount": "1 thumb-sized piece",
       "prep": "minced",
       "note": null
     },
     {
-      "item": "Spring onion",
-      "amount": null,
+      "item": "Spring onions",
+      "amount": "2 tbsp",
       "prep": "chopped",
-      "note": null
+      "note": "plus extra for garnish"
     },
     {
       "item": "Fresh coriander",
-      "amount": null,
+      "amount": "2 tbsp",
       "prep": "chopped",
       "note": null
     },
     {
       "item": "Sesame seeds",
-      "amount": null,
-      "prep": null,
-      "note": null
+      "amount": "1 tbsp each",
+      "prep": "toasted",
+      "note": "black and white"
     }
   ],
   "instructions": [
-    "Boil Jersey Royal potatoes.",
-    "Smash the boiled potatoes.",
-    "Season the smashed potatoes.",
-    "Roast the potatoes until crispy and golden.",
-    "Mix mayonnaise, yogurt, tahini, chili crisp, lime juice, soy sauce, garlic, and ginger to make the sauce.",
-    "Finish with spring onion, fresh coriander, and sesame seeds."
+    "Place potatoes in a large pot of cold, salted water. Bring to a boil, then simmer until fork tender (25-30 minutes).",
+    "Preheat oven to 180°C (350°F).",
+    "While potatoes cook, make the dressing: combine mayo, yogurt, tahini, chili crisp, garlic, ginger, soy sauce, rice wine vinegar, lime zest and juice in a bowl. Mix well, loosen with a splash of water if needed. Set aside in the fridge.",
+    "Once potatoes are fork tender, drain and let them steam dry completely (this is important!).",
+    "Place potatoes on a lined baking tray, leaving space between them. Using the bottom of a glass, firmly smash each potato flat in one motion.",
+    "Season with salt and pepper, drizzle generously with olive oil.",
+    "Roast for 30-45 minutes, flipping halfway, until completely crisp and golden. Add more oil if needed.",
+    "Let potatoes cool slightly. Add spring onion, coriander, and sesame seeds to the dressing.",
+    "In a large bowl, add half the dressing. Add the crispy potatoes and gently mix to coat. Add more dressing as needed.",
+    "Serve topped with extra spring onions, sesame seeds, and a drizzle of chili crisp."
   ],
-  "notes": "Full recipe details can be found in the link provided.",
+  "notes": "Jersey Royals are in season April-July and have an incredible nutty, buttery flavor. The key to crispy potatoes is letting them steam dry completely before smashing and roasting.",
   "colors": {
-    "primary": "hsl(280, 80%, 55%)",
-    "secondary": "hsl(310, 70%, 60%)",
-    "accent": "hsl(100, 75%, 50%)",
-    "gradient": "linear-gradient(135deg, hsl(280, 80%, 55%), hsl(320, 70%, 60%))"
+    "primary": "hsl(35, 80%, 50%)",
+    "secondary": "hsl(25, 70%, 55%)",
+    "accent": "hsl(120, 60%, 40%)",
+    "gradient": "linear-gradient(135deg, hsl(35, 80%, 50%), hsl(25, 70%, 55%))"
   }
 }
