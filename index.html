@@ -512,6 +512,8 @@
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.05);
             transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
         }
 
         .ingredient-item:hover {
@@ -519,12 +521,48 @@
             border-color: rgba(255,255,255,0.1);
         }
 
-        .ingredient-bullet {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-top: 0.5rem;
+        .ingredient-item.checked {
+            opacity: 0.5;
+        }
+
+        .ingredient-item.checked .ingredient-name {
+            text-decoration: line-through;
+        }
+
+        .ingredient-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid rgba(255,255,255,0.3);
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            margin-top: 0.1rem;
+        }
+
+        .ingredient-item:hover .ingredient-checkbox {
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .ingredient-item.checked .ingredient-checkbox {
+            border-color: transparent;
+            background: linear-gradient(135deg, #4ade80, #22c55e);
+        }
+
+        .ingredient-checkbox::after {
+            content: '✓';
+            font-size: 14px;
+            color: white;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s ease;
+        }
+
+        .ingredient-item.checked .ingredient-checkbox::after {
+            opacity: 1;
+            transform: scale(1);
         }
 
         .ingredient-text {
@@ -968,10 +1006,10 @@
                 ${details.ingredients?.length > 0 ? `
                     <section class="modal-section">
                         <h2 class="modal-section-title">Ingredients</h2>
-                        <ul class="ingredients-list">
-                            ${details.ingredients.map(ing => `
-                                <li class="ingredient-item">
-                                    <div class="ingredient-bullet" style="background: ${colors.primary || '#fff'}"></div>
+                        <ul class="ingredients-list" data-recipe="${slug}">
+                            ${details.ingredients.map((ing, idx) => `
+                                <li class="ingredient-item" data-index="${idx}">
+                                    <div class="ingredient-checkbox"></div>
                                     <div class="ingredient-text">
                                         <div class="ingredient-name">
                                             ${ing.item}
@@ -1021,6 +1059,42 @@
             modalOverlay.classList.add('active');
             document.body.classList.add('modal-open');
             document.body.style.overflow = 'hidden';
+
+            // Setup ingredient checkboxes
+            setupIngredientCheckboxes(slug);
+        }
+
+        // Ingredient checkbox functionality
+        function setupIngredientCheckboxes(slug) {
+            const storageKey = `recipe-checked-${slug}`;
+            const checked = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            
+            const items = document.querySelectorAll('.ingredient-item');
+            items.forEach(item => {
+                const idx = parseInt(item.dataset.index);
+                
+                // Restore checked state
+                if (checked.includes(idx)) {
+                    item.classList.add('checked');
+                }
+                
+                // Add click handler
+                item.addEventListener('click', () => {
+                    item.classList.toggle('checked');
+                    
+                    // Update storage
+                    const currentChecked = JSON.parse(localStorage.getItem(storageKey) || '[]');
+                    if (item.classList.contains('checked')) {
+                        if (!currentChecked.includes(idx)) {
+                            currentChecked.push(idx);
+                        }
+                    } else {
+                        const i = currentChecked.indexOf(idx);
+                        if (i > -1) currentChecked.splice(i, 1);
+                    }
+                    localStorage.setItem(storageKey, JSON.stringify(currentChecked));
+                });
+            });
         }
 
         // Highlight last word in title
