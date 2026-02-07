@@ -397,7 +397,7 @@
             aspect-ratio: 16/9;
             border-radius: 24px;
             overflow: hidden;
-            margin-bottom: 3rem;
+            margin-bottom: 2.5rem;
             position: relative;
         }
 
@@ -416,22 +416,15 @@
 
         .modal-header {
             margin-bottom: 3rem;
-        }
-
-        .modal-title-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
+            text-align: center;
         }
 
         .modal-title {
             font-family: 'Instrument Serif', serif;
-            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-size: clamp(2.5rem, 7vw, 4.5rem);
             font-weight: 400;
             line-height: 1.1;
-            flex: 1;
+            margin-bottom: 2rem;
         }
 
         .modal-title span {
@@ -440,31 +433,26 @@
 
         .modal-meta {
             display: flex;
-            gap: 1.5rem;
-            flex-shrink: 0;
-            padding-top: 0.5rem;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .modal-meta-item {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 0.25rem;
-            padding: 0.75rem 1rem;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            min-width: 70px;
+            gap: 0.5rem;
+            padding: 0.6rem 1.25rem;
+            background: rgba(255,255,255,0.08);
+            border-radius: 100px;
+            font-size: 0.85rem;
         }
 
         .modal-meta-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
             opacity: 0.5;
         }
 
         .modal-meta-value {
-            font-size: 0.95rem;
             font-weight: 600;
         }
 
@@ -485,14 +473,11 @@
             background: rgba(255,255,255,0.2);
         }
 
-        @media (max-width: 600px) {
-            .modal-title-row {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            .modal-meta {
-                align-self: flex-start;
-            }
+        .modal-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
         }
 
         .modal-section {
@@ -960,35 +945,27 @@
                     </div>
                 ` : ''}
                 <header class="modal-header">
-                    <div class="modal-title-row">
-                        <h1 class="modal-title">${highlightWords(details.title)}</h1>
-                        <div class="modal-meta">
-                            ${details.metadata?.time ? `
-                                <div class="modal-meta-item">
-                                    <span class="modal-meta-value">${details.metadata.time.replace(' minutes', 'min')}</span>
-                                    <span class="modal-meta-label">Time</span>
-                                </div>
-                            ` : ''}
-                            ${details.metadata?.difficulty ? `
-                                <div class="modal-meta-item">
-                                    <span class="modal-meta-value">${details.metadata.difficulty}</span>
-                                    <span class="modal-meta-label">Level</span>
-                                </div>
-                            ` : ''}
-                            ${details.metadata?.servings ? `
-                                <div class="modal-meta-item">
-                                    <span class="modal-meta-value">${details.metadata.servings}</span>
-                                    <span class="modal-meta-label">Serves</span>
-                                </div>
-                            ` : ''}
-                        </div>
+                    <div class="modal-meta">
+                        ${details.metadata?.time ? `
+                            <div class="modal-meta-item">
+                                <span class="modal-meta-label">⏱</span>
+                                <span class="modal-meta-value">${details.metadata.time}</span>
+                            </div>
+                        ` : ''}
+                        ${details.metadata?.difficulty ? `
+                            <div class="modal-meta-item">
+                                <span class="modal-meta-label">📊</span>
+                                <span class="modal-meta-value">${details.metadata.difficulty}</span>
+                            </div>
+                        ` : ''}
+                        ${details.metadata?.servings ? `
+                            <div class="modal-meta-item">
+                                <span class="modal-meta-label">👥</span>
+                                <span class="modal-meta-value">${details.metadata.servings} servings</span>
+                            </div>
+                        ` : ''}
                     </div>
-                    ${details.source?.url ? `
-                        <a href="${details.source.url}" target="_blank" rel="noopener" class="modal-source">
-                            <span>↗</span>
-                            ${details.source.platform || 'Original'} ${details.source.creator ? `by ${details.source.creator}` : ''}
-                        </a>
-                    ` : ''}
+                    <h1 class="modal-title">${highlightWords(details.title)}</h1>
                 </header>
 
                 ${details.ingredients?.length > 0 ? `
@@ -1030,6 +1007,15 @@
                         <h2 class="modal-section-title">Notes</h2>
                         <p style="opacity: 0.8; line-height: 1.7;">${details.notes}</p>
                     </section>
+                ` : ''}
+
+                ${details.source?.url ? `
+                    <footer class="modal-footer">
+                        <a href="${details.source.url}" target="_blank" rel="noopener" class="modal-source">
+                            <span>↗</span>
+                            Original on ${details.source.platform || 'web'} ${details.source.creator ? `by ${details.source.creator}` : ''}
+                        </a>
+                    </footer>
                 ` : ''}
             `;
 
