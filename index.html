@@ -386,6 +386,8 @@
         }
 
         .modal-content {
+            display: flex;
+            flex-direction: column;
             min-height: 100vh;
             padding: 4rem 3rem 4rem;
             max-width: 900px;
@@ -397,8 +399,8 @@
             aspect-ratio: 16/9;
             border-radius: 24px;
             overflow: hidden;
-            margin-bottom: 2.5rem;
             position: relative;
+            flex-shrink: 0;
         }
 
         .modal-hero img {
@@ -412,22 +414,20 @@
             position: absolute;
             inset: 0;
             background: linear-gradient(to top, var(--bg) 0%, transparent 40%);
+            pointer-events: none;
         }
 
         .modal-header {
-            margin-bottom: 3rem;
             text-align: center;
+            padding: 2.5rem 0 3rem;
         }
 
         .modal-title {
             font-family: 'Instrument Serif', serif;
-            font-size: clamp(2.2rem, 6vw, 3.5rem);
+            font-size: clamp(2rem, 5vw, 3rem);
             font-weight: 400;
-            line-height: 1.15;
-            margin-bottom: 1.5rem;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
+            line-height: 1.2;
+            margin: 0 0 1.25rem 0;
         }
 
         .modal-title span {
@@ -438,7 +438,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
             color: var(--text-muted);
             font-size: 0.9rem;
         }
@@ -448,7 +449,7 @@
         }
 
         .modal-meta-item {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 0.4rem;
         }
