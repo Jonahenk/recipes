@@ -209,29 +209,8 @@
             transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
         }
 
-        .recipe-card-bg.has-image {
-            background-size: cover;
-            background-position: center;
-            filter: blur(2px) brightness(0.7);
-        }
-
         .recipe-card:hover .recipe-card-bg {
             transform: scale(1.1);
-        }
-
-        .recipe-card:hover .recipe-card-bg.has-image {
-            filter: blur(0px) brightness(0.6);
-        }
-
-        /* Color accent bar for cards with images */
-        .recipe-card-accent {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            z-index: 3;
-            opacity: 0.8;
         }
 
         .recipe-card-content {
@@ -383,27 +362,6 @@
             padding: 6rem 3rem 4rem;
             max-width: 900px;
             margin: 0 auto;
-        }
-
-        .modal-hero {
-            width: 100%;
-            aspect-ratio: 16/9;
-            border-radius: 24px;
-            overflow: hidden;
-            margin-bottom: 3rem;
-            position: relative;
-        }
-
-        .modal-hero img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .modal-hero-gradient {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, var(--bg) 0%, transparent 50%);
         }
 
         .modal-header {
@@ -791,7 +749,7 @@
                 const data = await res.json();
                 recipes = data.recipes;
                 recipeCount.textContent = `${recipes.length} recipe${recipes.length !== 1 ? 's' : ''}`;
-                await renderRecipes(recipes);
+                renderRecipes(recipes);
                 
                 // Set initial ambient with first recipe colors
                 if (recipes.length > 0 && recipes[0].colors) {
@@ -809,29 +767,8 @@
             }
         }
 
-        // Check if image exists
-        async function imageExists(url) {
-            try {
-                const res = await fetch(url, { method: 'HEAD' });
-                return res.ok;
-            } catch {
-                return false;
-            }
-        }
-
-        // Preload images and store which ones exist
-        const imageCache = {};
-        async function checkImages(list) {
-            await Promise.all(list.map(async (recipe) => {
-                if (imageCache[recipe.slug] === undefined) {
-                    const url = `images/${recipe.slug}.jpg`;
-                    imageCache[recipe.slug] = await imageExists(url);
-                }
-            }));
-        }
-
         // Render recipe cards
-        async function renderRecipes(list) {
+        function renderRecipes(list) {
             if (list.length === 0) {
                 recipesGrid.innerHTML = `
                     <div class="empty-state">
@@ -843,23 +780,16 @@
                 return;
             }
 
-            // Check which images exist
-            await checkImages(list);
-
             recipesGrid.innerHTML = list.map((recipe, i) => {
                 const colors = recipe.colors || { gradient: 'linear-gradient(135deg, #667eea, #764ba2)' };
                 const tags = recipe.metadata?.tags?.slice(0, 3) || [];
-                const hasImage = imageCache[recipe.slug];
-                const imageUrl = `images/${recipe.slug}.jpg`;
                 
                 return `
                     <article class="recipe-card" 
                              data-slug="${recipe.slug}"
                              style="--delay: ${i * 0.1}s"
                              onmouseenter="updateAmbient(${JSON.stringify(colors).replace(/"/g, '&quot;')})">
-                        <div class="recipe-card-bg ${hasImage ? 'has-image' : ''}" 
-                             style="${hasImage ? `background-image: url('${imageUrl}');` : `background: ${colors.gradient};`}"></div>
-                        ${hasImage ? `<div class="recipe-card-accent" style="background: ${colors.gradient}"></div>` : ''}
+                        <div class="recipe-card-bg" style="background: ${colors.gradient}"></div>
                         <div class="recipe-card-content">
                             <h2 class="recipe-card-title">${recipe.title}</h2>
                             <div class="recipe-card-meta">
@@ -916,18 +846,8 @@
             // Update ambient
             updateAmbient(colors);
 
-            // Check for image
-            const hasImage = imageCache[slug];
-            const imageUrl = `images/${slug}.jpg`;
-
             // Build modal content
             modalContent.innerHTML = `
-                ${hasImage ? `
-                    <div class="modal-hero">
-                        <img src="${imageUrl}" alt="${details.title}">
-                        <div class="modal-hero-gradient"></div>
-                    </div>
-                ` : ''}
                 <header class="modal-header">
                     <h1 class="modal-title">${highlightWords(details.title)}</h1>
                     <div class="modal-meta">
@@ -1026,25 +946,21 @@
             if (e.key === 'Escape') closeModal();
         });
 
-        // Search (debounced)
-        let searchTimeout;
+        // Search
         searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                const query = e.target.value.toLowerCase().trim();
-                if (!query) {
-                    await renderRecipes(recipes);
-                    return;
-                }
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                renderRecipes(recipes);
+                return;
+            }
 
-                const filtered = recipes.filter(r => {
-                    const title = r.title.toLowerCase();
-                    const tags = (r.metadata?.tags || []).join(' ').toLowerCase();
-                    return title.includes(query) || tags.includes(query);
-                });
+            const filtered = recipes.filter(r => {
+                const title = r.title.toLowerCase();
+                const tags = (r.metadata?.tags || []).join(' ').toLowerCase();
+                return title.includes(query) || tags.includes(query);
+            });
 
-                await renderRecipes(filtered);
-            }, 150);
+            renderRecipes(filtered);
         });
 
         // Init
