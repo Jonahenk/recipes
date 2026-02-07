@@ -45,7 +45,13 @@
             z-index: 0;
             opacity: 0.4;
             filter: blur(150px);
-            transition: background 1s ease;
+            transition: background 1s ease, opacity 0.5s ease;
+        }
+
+        /* Brighter ambient when modal is open */
+        body.modal-open .ambient {
+            opacity: 0.6;
+            filter: blur(100px);
         }
 
         /* Header */
@@ -356,15 +362,16 @@
 
         .modal-close {
             position: fixed;
-            top: 2rem;
-            right: 2rem;
-            width: 56px;
-            height: 56px;
+            top: 1.5rem;
+            left: 1.5rem;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             cursor: pointer;
             z-index: 1002;
             display: flex;
@@ -374,13 +381,13 @@
         }
 
         .modal-close:hover {
-            background: rgba(255,255,255,0.2);
-            transform: rotate(90deg);
+            background: rgba(0,0,0,0.7);
+            transform: scale(1.1);
         }
 
         .modal-content {
             min-height: 100vh;
-            padding: 6rem 3rem 4rem;
+            padding: 5rem 3rem 4rem;
             max-width: 900px;
             margin: 0 auto;
         }
@@ -398,6 +405,7 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center 70%;
         }
 
         .modal-hero-gradient {
@@ -407,15 +415,23 @@
         }
 
         .modal-header {
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .modal-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
         }
 
         .modal-title {
             font-family: 'Instrument Serif', serif;
-            font-size: clamp(3rem, 8vw, 5rem);
+            font-size: clamp(2.5rem, 6vw, 4rem);
             font-weight: 400;
-            line-height: 1;
-            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            flex: 1;
         }
 
         .modal-title span {
@@ -424,27 +440,32 @@
 
         .modal-meta {
             display: flex;
-            gap: 2rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+            flex-shrink: 0;
+            padding-top: 0.5rem;
         }
 
         .modal-meta-item {
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 0.25rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            min-width: 70px;
         }
 
         .modal-meta-label {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             opacity: 0.5;
         }
 
         .modal-meta-value {
-            font-size: 1.1rem;
-            font-weight: 500;
+            font-size: 0.95rem;
+            font-weight: 600;
         }
 
         .modal-source {
@@ -462,6 +483,16 @@
 
         .modal-source:hover {
             background: rgba(255,255,255,0.2);
+        }
+
+        @media (max-width: 600px) {
+            .modal-title-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .modal-meta {
+                align-self: flex-start;
+            }
         }
 
         .modal-section {
@@ -656,9 +687,9 @@
 
             .modal-close {
                 top: 1rem;
-                right: 1rem;
-                width: 48px;
-                height: 48px;
+                left: 1rem;
+                width: 44px;
+                height: 44px;
             }
         }
 
@@ -929,20 +960,28 @@
                     </div>
                 ` : ''}
                 <header class="modal-header">
-                    <h1 class="modal-title">${highlightWords(details.title)}</h1>
-                    <div class="modal-meta">
-                        ${details.metadata?.time ? `
-                            <div class="modal-meta-item">
-                                <span class="modal-meta-label">Time</span>
-                                <span class="modal-meta-value">${details.metadata.time}</span>
-                            </div>
-                        ` : ''}
-                        ${details.metadata?.difficulty ? `
-                            <div class="modal-meta-item">
-                                <span class="modal-meta-label">Difficulty</span>
-                                <span class="modal-meta-value">${details.metadata.difficulty}</span>
-                            </div>
-                        ` : ''}
+                    <div class="modal-title-row">
+                        <h1 class="modal-title">${highlightWords(details.title)}</h1>
+                        <div class="modal-meta">
+                            ${details.metadata?.time ? `
+                                <div class="modal-meta-item">
+                                    <span class="modal-meta-value">${details.metadata.time.replace(' minutes', 'min')}</span>
+                                    <span class="modal-meta-label">Time</span>
+                                </div>
+                            ` : ''}
+                            ${details.metadata?.difficulty ? `
+                                <div class="modal-meta-item">
+                                    <span class="modal-meta-value">${details.metadata.difficulty}</span>
+                                    <span class="modal-meta-label">Level</span>
+                                </div>
+                            ` : ''}
+                            ${details.metadata?.servings ? `
+                                <div class="modal-meta-item">
+                                    <span class="modal-meta-value">${details.metadata.servings}</span>
+                                    <span class="modal-meta-label">Serves</span>
+                                </div>
+                            ` : ''}
+                        </div>
                     </div>
                     ${details.source?.url ? `
                         <a href="${details.source.url}" target="_blank" rel="noopener" class="modal-source">
@@ -997,6 +1036,7 @@
             // Show modal
             modal.classList.add('active');
             modalOverlay.classList.add('active');
+            document.body.classList.add('modal-open');
             document.body.style.overflow = 'hidden';
         }
 
@@ -1012,6 +1052,7 @@
         function closeModal() {
             modal.classList.remove('active');
             modalOverlay.classList.remove('active');
+            document.body.classList.remove('modal-open');
             document.body.style.overflow = '';
             
             // Reset ambient
