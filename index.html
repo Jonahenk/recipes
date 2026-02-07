@@ -54,8 +54,8 @@
             filter: blur(100px);
         }
 
-        /* Header */
-        header {
+        /* Site Header */
+        .site-header {
             position: fixed;
             top: 0;
             left: 0;
@@ -745,7 +745,7 @@
     <div class="ambient" id="ambient"></div>
 
     <!-- Header -->
-    <header>
+    <header class="site-header">
         <div class="logo">recipes</div>
         <div class="header-actions">
             <div class="search-wrapper">
@@ -960,10 +960,10 @@
                         <div class="modal-hero-gradient"></div>
                     </div>
                 ` : ''}
-                <header class="modal-header">
+                <div class="modal-header">
                     <h1 class="modal-title">${highlightWords(details.title)}</h1>
                     ${metaHtml ? `<div class="modal-meta">${metaHtml}</div>` : ''}
-                </header>
+                </div>
 
                 ${details.ingredients?.length > 0 ? `
                     <section class="modal-section">
